@@ -6,6 +6,8 @@ SoundFile note;
 import controlP5.*;
 ControlP5 cp5;
 
+int mouseStatus;
+
 //array of available notes
 String[] notes = {
   "C3", "C#3", "D3", "D#3",
@@ -14,34 +16,50 @@ String[] notes = {
   "C4"
 };
 
-//cp5 vars
-int myColor = color(255);
-int c1,c2;
-float n,n1;
-
 void setup() {
-  size(300,600);
-  noStroke();
+  size(1060,610);
   cp5 = new ControlP5(this);
   
+  //Create a button for each piano note
   for (int i = 0; i < notes.length; i++) {
     cp5.addButton(notes[i])
       .setValue(i)
-      .setPosition(10 + (i*20), 10)
-      .setSize(19,80)
+      .setPosition(10 + (i*80), 400)
+      .setSize(79,200)
       ;
   }
 }
 
 void draw() {
   background(200);
-  myColor = lerpColor(c1,c2,n);
-  n += (1-n)* 0.1; 
+  if ( mouseStatus != checkForMouseOver(mouseX, mouseY) )
+  {
+    mouseStatus = checkForMouseOver(mouseX, mouseY);
+    playNote(mouseStatus);
+  }
 }
 
-public void controlEvent(ControlEvent theEvent) {
-  println(theEvent.getController().getName());
-  note = new SoundFile(this, "piano/" + theEvent.getController().getName() + ".wav");
-  note.play();
-  n = 0;
+
+public int checkForMouseOver (int x, int y)
+{
+  //checks position of x and y and returns
+  //array index of note being moused over
+  
+  int i = -1;
+
+  if ( y >= 400 && x > 10 && x < 1050 )
+  {
+    i = (x - 10) / 80;
+  }
+  
+  return i;
+}
+
+public void playNote (int cmd)
+{
+  if (cmd != -1)
+  {
+    note = new SoundFile(this, "piano/" + notes[cmd] + ".wav");
+    note.play(); 
+  }
 }
